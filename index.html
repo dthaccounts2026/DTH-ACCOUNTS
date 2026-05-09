@@ -3939,7 +3939,7 @@ function _showAppUI(uid){
 function firebaseConfig_isPlaceholder(){
   // If Firebase successfully initialised, config is real — never treat as placeholder
   if(window._fbReady === true) return false;
-  if(window._fbConfigMissing === true) return true;
+  if(window._fbConfigMissing === true) return false;
   // Also check localStorage saved config
   try {
     var saved = JSON.parse(localStorage.getItem('u888_fb_cfg')||'{}');
