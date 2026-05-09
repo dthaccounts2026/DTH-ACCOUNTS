@@ -3943,7 +3943,7 @@ function firebaseConfig_isPlaceholder(){
   // Also check localStorage saved config
   try {
     var saved = JSON.parse(localStorage.getItem('u888_fb_cfg')||'{}');
-    if(saved && saved.apiKey && saved.apiKey !== 'PASTE_YOUR_apiKey_HERE') return false;
+    if(saved && saved.apiKey && saved.apiKey !== 'AIzaSyB-oMb0P2-l793AUII8YU-pyQqlaFIZ28U') return false;
   } catch(e){}
   return true;
 }
@@ -3958,7 +3958,7 @@ function _injectCloudSettingsUI(){
   // Load saved config
   let savedCfg = {};
   try { savedCfg = JSON.parse(localStorage.getItem('u888_fb_cfg')||'{}'); } catch(e){}
-  const hasConfig = savedCfg && savedCfg.apiKey && savedCfg.apiKey !== 'PASTE_YOUR_apiKey_HERE';
+  const hasConfig = savedCfg && savedCfg.apiKey && savedCfg.apiKey !== 'AIzaSyB-oMb0P2-l793AUII8YU-pyQqlaFIZ28U';
 
   const cloudCard = document.createElement('div');
   cloudCard.className = 'form-card';
