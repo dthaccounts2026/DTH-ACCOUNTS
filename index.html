@@ -3749,7 +3749,8 @@ function _setLoginMsg(msg, isErr){
 const _origDoLogin = window.doLogin;
 window.doLogin = async function(){
   const fb = _fb();
-  // If Firebase not ready or no config, fall back to local login
+  if(!navigator.onLine){_origDoLogin&&_origDoLogin();return;}
+// If Firebase not ready or no config, fall back to local login
   if(!fb || !window._fbReady || firebaseConfig_isPlaceholder()){
     console.log('Firebase not configured — using local login');
     _origDoLogin && _origDoLogin();
