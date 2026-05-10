@@ -3573,7 +3573,7 @@ let _pendingWrite = false;
 
 function _fb(){ return window._fb || null; }
 
-function _showSyncBadge(state){
+function _showSyncBadge(state){ return;
   // state: 'syncing' | 'synced' | 'offline' | 'error'
   let badge = document.getElementById('_cloud_badge');
   if(!badge){
