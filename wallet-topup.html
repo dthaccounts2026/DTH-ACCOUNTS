@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d0d0d">
+<title>Wallet Top-Up — Digital Smart</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d0d;
+  --surface: #141420;
+  --surface2: #1a1a2e;
+  --surface3: #1e1e32;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --gold: #f5a623;
+  --gold-grad: linear-gradient(135deg,#ffd166,#f5a623,#e8831a);
+  --green: #2ecc71;
+  --red: #e74c3c;
+  --text: #f8faff;
+  --text2: #aaa;
+  --text3: #666;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  padding: 0 0 80px;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(180deg,#1a1a2e,rgba(26,26,46,0.97));
+  border-bottom: 1px solid var(--border2);
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 12px;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo {
+  width: 42px; height: 42px; min-width: 42px;
+  background: var(--gold-grad); border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.header-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px; font-weight: 700; color: var(--gold);
+}
+.header-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+.back-btn {
+  margin-left: auto;
+  background: var(--surface3); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 7px 14px;
+  font-size: 13px; font-weight: 700; color: var(--text2);
+  cursor: pointer; text-decoration: none; display: inline-block;
+}
+.back-btn:active { opacity: 0.7; }
+
+/* Content */
+.content { padding: 16px; max-width: 500px; margin: 0 auto; }
+
+/* Card */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-xl);
+  padding: 20px 16px;
+  position: relative; overflow: hidden;
+  margin-bottom: 16px;
+}
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--gold-grad);
+}
+.card-title {
+  font-size: 13px; font-weight: 800; color: var(--text2);
+  text-transform: uppercase; letter-spacing: 2px;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border2), transparent);
+}
+
+/* Field */
+.field { margin-bottom: 13px; }
+.field label {
+  font-size: 13px; font-weight: 700; color: var(--text2);
+  display: block; margin-bottom: 6px; letter-spacing: 0.5px;
+}
+.field label .ta { font-size: 11px; color: var(--text3); margin-left: 4px; }
+.field input, .field select {
+  width: 100%; padding: 12px 14px;
+  background: var(--surface3);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text); font-size: 16px;
+  outline: none; transition: all .2s;
+  font-family: inherit;
+}
+.field input:focus, .field select:focus {
+  border-color: var(--gold);
+  background: rgba(245,166,35,0.04);
+  box-shadow: 0 0 0 3px rgba(245,166,35,0.1);
+}
+.field input[type="date"] {
+  border-color: rgba(245,166,35,0.35);
+}
+.field input[type="date"]:focus {
+  border-color: var(--gold);
+}
+.field select option { background: var(--surface2); }
+
+/* Balance display */
+.balance-box {
+  background: var(--surface2);
+  border: 1px solid rgba(46,204,113,0.2);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  margin-bottom: 13px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.balance-box .bl { font-size: 12px; color: var(--text3); }
+.balance-box .bv {
+  font-size: 24px; font-weight: 800;
+  color: var(--green); font-family: monospace;
+}
+
+/* New balance preview */
+.preview-box {
+  background: rgba(46,204,113,0.06);
+  border: 1px solid rgba(46,204,113,0.2);
+  border-radius: var(--r-md);
+  padding: 11px 14px; margin-bottom: 13px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.preview-box .pl { font-size: 12px; color: var(--text3); }
+.preview-box .pv { font-size: 20px; font-weight: 800; color: var(--green); font-family: monospace; }
+
+/* Submit button */
+.btn-submit {
+  width: 100%; padding: 14px;
+  background: var(--gold-grad);
+  border: none; border-radius: var(--r-md);
+  color: #1a0800; font-size: 15px; font-weight: 900;
+  cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  box-shadow: 0 4px 16px rgba(245,166,35,0.3);
+  font-family: inherit;
+}
+.btn-submit:active { transform: scale(0.97); opacity: .85; }
+
+/* Total bar */
+.total-bar {
+  background: rgba(245,166,35,0.07);
+  border: 1px solid rgba(245,166,35,0.2);
+  border-radius: var(--r-md);
+  padding: 11px 14px;
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px;
+}
+.total-bar .tl { font-size: 13px; color: var(--gold); font-weight: 700; }
+.total-bar .tv { font-size: 19px; font-weight: 800; color: var(--gold); font-family: monospace; }
+
+/* Section title */
+.section-title {
+  font-size: 12px; color: var(--text2);
+  font-weight: 800; letter-spacing: 2px;
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 10px;
+}
+.section-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border2), transparent);
+}
+
+/* History items */
+.hist-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.hist-left .wallet-name { font-size: 14px; font-weight: 800; color: var(--text); }
+.hist-left .hist-meta { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.hist-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.hist-amount { font-size: 17px; font-weight: 800; color: var(--green); font-family: monospace; }
+.hist-date {
+  font-size: 10px; color: var(--text3);
+  background: rgba(46,204,113,0.08);
+  border: 1px solid rgba(46,204,113,0.15);
+  border-radius: 10px; padding: 2px 7px;
+}
+.del-btn {
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.2);
+  border-radius: 7px; padding: 4px 9px;
+  font-size: 11px; font-weight: 700;
+  color: var(--red); cursor: pointer;
+  margin-top: 4px; transition: all .15s;
+}
+.del-btn:active { background: rgba(231,76,60,0.2); }
+
+/* Filter bar */
+.filter-bar {
+  display: flex; gap: 6px; margin-bottom: 10px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+.chip {
+  flex-shrink: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 12px;
+  font-size: 11px; font-weight: 700;
+  color: var(--text2); cursor: pointer;
+  white-space: nowrap;
+}
+.chip.active {
+  background: rgba(245,166,35,0.1);
+  border-color: rgba(245,166,35,0.3);
+  color: var(--gold);
+}
+
+/* Empty state */
+.empty { text-align: center; padding: 28px; color: var(--text3); font-size: 13px; }
+.empty .icon { font-size: 32px; display: block; margin-bottom: 8px; opacity: 0.4; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 20px; left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-lg);
+  padding: 11px 20px; font-size: 13px; font-weight: 700;
+  color: var(--text); z-index: 9999;
+  opacity: 0; transition: all .25s;
+  white-space: nowrap; max-width: 90vw;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.ok { border-color: rgba(46,204,113,0.4); color: var(--green); }
+.toast.err { border-color: rgba(231,76,60,0.4); color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">📡</div>
+  <div>
+    <div class="header-title">Digital Smart</div>
+    <div class="header-sub">Wallet Top-Up — பணம் சேர்</div>
+  </div>
+  <a href="index.html" class="back-btn">← Back</a>
+</div>
+
+<div class="content">
+
+  <!-- Add Money Card -->
+  <div class="card">
+    <div class="card-title">💰 Add Cash to Wallet <span style="font-size:11px;font-weight:500">பணம் சேர்</span></div>
+
+    <div class="field">
+      <label>💳 Select Wallet <span class="ta">பணப்பை தேர்வு</span></label>
+      <select id="walletSelect" onchange="updateBalance()">
+        <option value="">-- தேர்வு செய்யுங்கள் --</option>
+      </select>
+    </div>
+
+    <!-- Current Balance -->
+    <div class="balance-box" id="balanceBox" style="display:none">
+      <div>
+        <div class="bl">Current Balance / தற்போதைய இருப்பு</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px" id="walletNameLbl">—</div>
+      </div>
+      <div class="bv" id="currentBal">₹0.00</div>
+    </div>
+
+    <div class="field">
+      <label>₹ Amount to Add <span class="ta">சேர்க்கும் தொகை</span></label>
+      <input type="number" id="addAmount" placeholder="e.g. 500" min="0" step="0.01" oninput="updatePreview()">
+    </div>
+
+    <!-- ✅ DATE FIELD — இதுதான் fix! -->
+    <div class="field">
+      <label>📅 Date <span class="ta">தேதி</span></label>
+      <input type="date" id="addDate">
+    </div>
+
+    <div class="field">
+      <label>📝 Note (optional) <span class="ta">குறிப்பு</span></label>
+      <input type="text" id="addNote" placeholder="e.g. Paytm transfer, Bank deposit...">
+    </div>
+
+    <!-- New balance preview -->
+    <div class="preview-box" id="previewBox" style="display:none">
+      <span class="pl">New Balance after adding</span>
+      <span class="pv" id="previewVal">₹0.00</span>
+    </div>
+
+    <button class="btn-submit" onclick="addCash()">
+      ➕ Add Money / பணம் சேர்
+    </button>
+  </div>
+
+  <!-- Total Bar -->
+  <div class="total-bar">
+    <div class="tl">💰 Total Added (All Wallets)</div>
+    <div class="tv" id="totalAdded">₹0.00</div>
+  </div>
+
+  <!-- History -->
+  <div class="section-title">📋 Top-Up History <span style="font-size:10px;font-weight:500;color:var(--text3)">வரலாறு</span></div>
+
+  <div class="filter-bar" id="filterBar">
+    <div class="chip active" onclick="filterHistory('all',this)">All</div>
+  </div>
+
+  <div id="historyList">
+    <div class="empty">
+      <span class="icon">💳</span>
+      No top-ups yet<br>
+      <span style="font-size:10px;color:#444;margin-top:4px;display:block">பணம் சேர்க்கவில்லை</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══ STORAGE ══ */
+function load(key, def) {
+  try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : def; }
+  catch(e) { return def; }
+}
+function save(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
+}
+
+/* ══ SHARED KEYS — main app-உடன் share ஆகும் ══ */
+const WALLETS_KEY = 'dth_wallets';
+const HISTORY_KEY = 'dth_wallet_add_history';
+
+let wallets = load(WALLETS_KEY, []);
+let history = load(HISTORY_KEY, []);
+
+/* ══ INIT ══ */
+function init() {
+  // Today's date set பண்ணு
+  const today = new Date();
+  document.getElementById('addDate').value =
+    today.getFullYear() + '-' +
+    String(today.getMonth() + 1).padStart(2, '0') + '-' +
+    String(today.getDate()).padStart(2, '0');
+
+  renderWalletOptions();
+  renderHistory('all');
+  updateTotal();
+}
+
+/* ══ WALLET OPTIONS ══ */
+function renderWalletOptions() {
+  const sel = document.getElementById('walletSelect');
+  const prev = sel.value;
+  if (!wallets.length) {
+    sel.innerHTML = '<option value="">— No wallets found. Add in main app —</option>';
+    return;
+  }
+  sel.innerHTML = '<option value="">-- தேர்வு செய்யுங்கள் --</option>' +
+    wallets.map((w, i) =>
+      `<option value="${i}">💳 ${w.name} (₹${w.balance.toFixed(2)})</option>`
+    ).join('');
+  if (prev !== '') sel.value = prev;
+}
+
+function updateBalance() {
+  const idx = document.getElementById('walletSelect').value;
+  const box = document.getElementById('balanceBox');
+  if (idx === '') { box.style.display = 'none'; return; }
+  const w = wallets[parseInt(idx)];
+  document.getElementById('walletNameLbl').textContent = '💳 ' + w.name;
+  document.getElementById('currentBal').textContent = '₹' + w.balance.toFixed(2);
+  document.getElementById('currentBal').style.color = w.balance < 100 ? 'var(--red)' : 'var(--green)';
+  box.style.display = 'flex';
+  updatePreview();
+}
+
+function updatePreview() {
+  const idx = document.getElementById('walletSelect').value;
+  const amt = parseFloat(document.getElementById('addAmount').value) || 0;
+  const box = document.getElementById('previewBox');
+  if (idx === '' || amt <= 0) { box.style.display = 'none'; return; }
+  const w = wallets[parseInt(idx)];
+  document.getElementById('previewVal').textContent = '₹' + (w.balance + amt).toFixed(2);
+  box.style.display = 'flex';
+}
+
+/* ══ ADD CASH ══ */
+function addCash() {
+  const idx      = document.getElementById('walletSelect').value;
+  const amt      = parseFloat(document.getElementById('addAmount').value);
+  const dateInput = document.getElementById('addDate').value;
+  const note     = document.getElementById('addNote').value.trim();
+
+  if (idx === '')        { showToast('⚠️ Wallet தேர்வு செய்யுங்கள்', 'err'); return; }
+  if (!amt || amt <= 0) { showToast('⚠️ தொகை உள்ளிடுங்கள்', 'err'); return; }
+  if (!dateInput)        { showToast('⚠️ தேதி தேர்வு செய்யுங்கள்', 'err'); return; }
+
+  const i = parseInt(idx);
+
+  // Wallet balance update
+  wallets[i].balance = Math.round((wallets[i].balance + amt) * 10000) / 10000;
+
+  // Date format: D/M/YYYY
+  const dp = dateInput.split('-');
+  const formattedDate = dp[2] + '/' + dp[1] + '/' + dp[0];
+
+  // History save
+  history.push({
+    id: Date.now(),
+    wallet: wallets[i].name,
+    walletIdx: i,
+    amount: amt,
+    date: formattedDate,
+    dateRaw: dateInput,
+    time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+    note: note || ''
+  });
+
+  // Save to localStorage — main app sync ஆகும்
+  save(WALLETS_KEY, wallets);
+  save(HISTORY_KEY, history);
+
+  // UI update
+  renderWalletOptions();
+  updateBalance();
+  renderHistory('all');
+  updateTotal();
+
+  // Form clear
+  document.getElementById('addAmount').value = '';
+  document.getElementById('addNote').value = '';
+  document.getElementById('previewBox').style.display = 'none';
+
+  // Reset date to today
+  const today = new Date();
+  document.getElementById('addDate').value =
+    today.getFullYear() + '-' +
+    String(today.getMonth() + 1).padStart(2, '0') + '-' +
+    String(today.getDate()).padStart(2, '0');
+
+  showToast(`✅ ₹${amt.toFixed(2)} added to ${wallets[i].name}!`, 'ok');
+}
+
+/* ══ HISTORY ══ */
+let _activeFilter = 'all';
+
+function filterHistory(filter, el) {
+  _activeFilter = filter;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderHistory(filter);
+}
+
+function renderHistory(filter) {
+  const el = document.getElementById('historyList');
+
+  // Filter chips rebuild
+  const filterBar = document.getElementById('filterBar');
+  filterBar.innerHTML = `<div class="chip ${filter==='all'?'active':''}" onclick="filterHistory('all',this)">All</div>` +
+    wallets.map(w =>
+      `<div class="chip ${filter===w.name?'active':''}" onclick="filterHistory('${w.name}',this)">${w.name}</div>`
+    ).join('');
+
+  let list = [...history].reverse();
+  if (filter !== 'all') list = list.filter(r => r.wallet === filter);
+
+  if (!list.length) {
+    el.innerHTML = `<div class="empty">
+      <span class="icon">💳</span>
+      No records${filter !== 'all' ? ' for ' + filter : ''}<br>
+      <span style="font-size:10px;color:#444">பதிவுகள் இல்லை</span>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(r => {
+    const realIdx = history.findIndex(x => x.id === r.id);
+    return `<div class="hist-item">
+      <div class="hist-left">
+        <div class="wallet-name">💳 ${r.wallet}</div>
+        <div class="hist-meta">${r.time}${r.note ? ' • ' + r.note : ''}</div>
+      </div>
+      <div class="hist-right">
+        <div class="hist-amount">+₹${r.amount.toFixed(2)}</div>
+        <div class="hist-date">📅 ${r.date}</div>
+        <button class="del-btn" onclick="deleteEntry(${realIdx})">🗑 Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function deleteEntry(idx) {
+  const r = history[idx];
+  if (!r) return;
+  if (!confirm(`Delete ₹${r.amount.toFixed(2)} added to ${r.wallet} on ${r.date}?\nWallet balance reduced.`)) return;
+
+  // Wallet balance restore
+  const wi = wallets.findIndex(w => w.name === r.wallet);
+  if (wi >= 0) {
+    wallets[wi].balance = Math.round((wallets[wi].balance - r.amount) * 10000) / 10000;
+  }
+
+  history.splice(idx, 1);
+  save(WALLETS_KEY, wallets);
+  save(HISTORY_KEY, history);
+
+  renderWalletOptions();
+  updateBalance();
+  renderHistory(_activeFilter);
+  updateTotal();
+  showToast('🗑 Deleted — wallet balance restored', 'err');
+}
+
+function updateTotal() {
+  const total = history.reduce((s, r) => s + (r.amount || 0), 0);
+  document.getElementById('totalAdded').textContent = '₹' + total.toFixed(2);
+}
+
+/* ══ TOAST ══ */
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+init();
+</script>
+</body>
+</html>
