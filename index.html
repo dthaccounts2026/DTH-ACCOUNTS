@@ -3667,32 +3667,30 @@ function deleteReinvest(idx) {
   if (idx < 0 || idx >= hist.length) return;
   const deleted = hist[idx];
 
-  // Reverse wallet balance
+  // ── Reverse wallet balance (add back the INR that was taken) ──
   const wi = wallets.findIndex(w => w.name === deleted.wallet);
   if (wi >= 0) {
-    wallets[wi].balance -= deleted.inr;
-    if (wallets[wi].balance < 0) wallets[wi].balance = 0;
+    wallets[wi].balance = (wallets[wi].balance || 0) + (deleted.inr || 0);
   }
 
-  // Reverse reinvested amount
-  if (deleted.mode === 'Profit') reinvested -= deleted.lkr;
-  if (reinvested < 0) reinvested = 0;
-
-  // Remove from history
+  // ── Remove from history first ──
   hist.splice(idx, 1);
   safeSetItem('dth_ri_history', JSON.stringify(hist));
 
-  // Update reinvest start date AND timestamp to previous reinvestment (or clear if none left)
+  // ── Recalculate reinvested from remaining history ──
+  reinvested = hist.reduce(function(sum, r) {
+    return sum + (r.mode === 'Profit' ? (r.lkr || 0) : 0);
+  }, 0);
+  if (reinvested < 0) reinvested = 0;
+  localStorage.setItem('dth_reinvested', String(reinvested));
+
+  // ── Update reinvest start date to last remaining entry (or clear if none) ──
   if (hist.length === 0) {
     safeRemoveItem('dth_reinvest_start_date');
     localStorage.removeItem('dth_reinvest_timestamp');
-    reinvested = 0;
-    localStorage.setItem('dth_reinvested', '0');
   } else {
-    // Use the last remaining reinvestment's date and reconstruct a timestamp from it
     const lastRi = hist[hist.length - 1];
     if (lastRi.rawDate) safeSetItem('dth_reinvest_start_date', lastRi.rawDate);
-    // Restore timestamp: use rawDate start-of-day so entries after that date are included
     const p = (lastRi.rawDate || '').split('-');
     const restoredTs = p.length === 3
       ? new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]), 0, 0, 0, 0).getTime()
@@ -3701,7 +3699,7 @@ function deleteReinvest(idx) {
   }
 
   save(); refreshReinvestDisplay(); refreshWalletPage(); refreshHome(); refreshWalletSelects();
-  showToast('🗑️ Reinvestment deleted — Income restored ✅', 'ok');
+  showToast('🗑️ Reinvestment deleted — Income & Profit restored ✅', 'ok');
 }
 
 function editReinvest(idx) {
