@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Finance</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;--card:#161b22;--card2:#1c2128;--border:#30363d;
+  --gold:#f0d080;--orange:#e05a00;--gold2:#c8860a;
+  --green:#2ea043;--gl:#56d364;--red:#f85149;
+  --text:#e6edf3;--muted:#8b949e;
+  --ink:#1a1a2e;--paper:#fdf8f0;--line:#b8a070;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Courier Prime',monospace;
+  min-height:100vh;padding-bottom:70px;}
+
+/* NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#0d1117;
+  border-top:1px solid #30363d;display:flex;z-index:999;height:62px;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;cursor:pointer;border:none;background:none;
+  color:var(--muted);font-family:'Courier Prime',monospace;font-size:.65rem;
+  letter-spacing:.5px;touch-action:manipulation;transition:color .2s;
+  -webkit-tap-highlight-color:transparent;}
+.nav-btn .icon{font-size:1.4rem;}
+.nav-btn.active{color:var(--gold);}
+
+/* PAGES */
+.page{display:none;min-height:calc(100vh - 70px);padding:20px 16px;
+  flex-direction:column;align-items:center;gap:18px;}
+.page.active{display:flex;}
+.page-title{font-family:'Playfair Display',serif;font-size:1.6rem;
+  color:var(--gold);text-align:center;font-weight:700;}
+.page-sub{color:var(--muted);font-size:.8rem;text-align:center;margin-top:-10px;}
+
+/* ═══════════════ CHEQUE ═══════════════ */
+.panel{background:rgba(255,255,255,.06);border:1px solid rgba(200,134,10,.3);
+  border-radius:14px;padding:22px;width:100%;max-width:560px;
+  display:flex;flex-direction:column;gap:16px;}
+.field label{display:block;color:var(--gold);font-size:.78rem;
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;
+  font-family:'Playfair Display',serif;}
+.field input{width:100%;background:rgba(255,255,255,.1);
+  border:1px solid rgba(200,134,10,.4);border-radius:8px;color:#fff;
+  font-family:'Courier Prime',monospace;font-size:1rem;padding:10px 14px;outline:none;}
+.field input:focus{border-color:var(--gold);background:rgba(255,255,255,.14);}
+.field input::placeholder{color:rgba(255,255,255,.35);}
+.crow{display:flex;gap:14px;}.crow .field{flex:1;}
+.btn-generate{background:linear-gradient(135deg,#c8860a,#e05a00);color:#fff;
+  border:none;border-radius:10px;padding:13px;font-family:'Playfair Display',serif;
+  font-size:1rem;letter-spacing:1px;cursor:pointer;touch-action:manipulation;}
+.cheque-wrap{width:100%;max-width:760px;}
+.cheque{background:var(--paper);border-radius:8px;padding:22px 28px 20px;
+  box-shadow:0 14px 50px rgba(0,0,0,.55);position:relative;overflow:hidden;
+  font-family:'Courier Prime',monospace;color:var(--ink);}
+.cheque::before{content:'SAMPATH SUPREME';position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) rotate(-30deg);font-size:3rem;
+  font-family:'Playfair Display',serif;color:rgba(200,134,10,.08);
+  white-space:nowrap;pointer-events:none;font-weight:700;}
+.cheque::after{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 23px,
+  rgba(184,160,112,.15) 23px,rgba(184,160,112,.15) 24px);pointer-events:none;z-index:0;}
+.cheque-header,.date-section,.pay-row,.words-row,.cheque-bottom{position:relative;z-index:1;}
+.cheque-header{display:flex;justify-content:space-between;margin-bottom:10px;}
+.supreme-badge{font-family:'Playfair Display',serif;font-size:1.6rem;
+  color:var(--orange);font-style:italic;}
+.supreme-badge small{font-size:.55rem;display:block;text-align:right;color:#888;margin-top:-4px;}
+.date-section{display:flex;justify-content:flex-end;margin-bottom:12px;}
+.date-box{border:1px solid var(--line);border-radius:4px;padding:4px 10px;
+  font-size:.75rem;color:#555;display:flex;align-items:center;gap:6px;}
+.date-val{font-size:.95rem;font-weight:700;color:var(--ink);letter-spacing:1px;min-width:80px;}
+.pay-row{display:flex;align-items:baseline;gap:8px;
+  border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:10px;}
+.pay-label{font-size:.85rem;color:#555;white-space:nowrap;}
+.pay-name{font-size:1.3rem;font-weight:700;color:var(--ink);flex:1;letter-spacing:1px;}
+.words-row{border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:14px;}
+.words-label{font-size:.72rem;color:#888;margin-bottom:2px;}
+.words-val{font-size:1.05rem;font-weight:600;color:var(--ink);line-height:1.5;letter-spacing:.5px;}
+.cheque-bottom{display:flex;justify-content:flex-end;}
+.amount-box{border:2px solid var(--line);border-radius:6px;padding:6px 14px;text-align:right;min-width:140px;}
+.amount-box .currency{font-size:.65rem;color:#888;}
+.amount-fig{font-size:1.2rem;font-weight:700;color:var(--ink);}
+.cheque.empty .pay-name,.cheque.empty .words-val,
+.cheque.empty .amount-fig,.cheque.empty .date-val{color:#ccc;}
+
+/* ═══════════════ SCANNER ═══════════════ */
+.grand-card{width:100%;max-width:480px;
+  background:linear-gradient(135deg,#1a2a1a,#0d1a0d);
+  border:2px solid var(--green);border-radius:16px;
+  padding:18px 24px;text-align:center;}
+.grand-label{font-size:.7rem;letter-spacing:2px;color:var(--gl);text-transform:uppercase;}
+.grand-amt{font-family:'Playfair Display',serif;font-size:2.6rem;color:#fff;margin:4px 0;}
+.grand-amt span{color:var(--gl);}
+.grand-sub{font-size:.78rem;color:var(--muted);}
+
+/* UPLOAD CARD */
+.upload-card{width:100%;max-width:480px;background:var(--card);
+  border:1px solid var(--border);border-radius:16px;padding:18px;
+  display:flex;flex-direction:column;gap:12px;}
+.upload-card h3{font-family:'Playfair Display',serif;color:var(--gold);font-size:1rem;}
+
+.three-btns{display:flex;gap:10px;}
+.file-btn-wrap{position:relative;flex:1;height:72px;border-radius:12px;overflow:hidden;}
+.file-btn-bg{position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:#fff;font-family:'Courier Prime',monospace;font-size:1.2rem;font-weight:700;gap:2px;
+  pointer-events:none;}
+.file-btn-bg span{font-size:.72rem;letter-spacing:.5px;}
+.file-btn-wrap input[type="file"]{position:absolute;inset:0;width:100%;height:100%;
+  opacity:0;cursor:pointer;font-size:100px;z-index:10;}
+
+#prev-wrap{display:none;border-radius:8px;overflow:hidden;border:1px solid var(--border);}
+#prev-img{width:100%;max-height:220px;object-fit:contain;display:block;background:#000;}
+
+.scan-btn{width:100%;padding:15px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,#1a6b2a,#2ea043);
+  color:#fff;font-family:'Courier Prime',monospace;font-size:1rem;font-weight:700;
+  cursor:pointer;touch-action:manipulation;display:none;}
+.scan-btn:disabled{opacity:.35;pointer-events:none;}
+
+.sstatus{font-size:.82rem;text-align:center;min-height:20px;color:var(--muted);}
+.sstatus.loading{color:var(--gold);}
+.sstatus.success{color:var(--gl);}
+.sstatus.error{color:var(--red);}
+
+/* SLIP LIST */
+.slips-wrap{width:100%;max-width:480px;display:flex;flex-direction:column;gap:14px;}
+
+.slip-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.slip-header{display:flex;align-items:center;gap:10px;padding:12px 14px;
+  border-bottom:1px solid var(--border);background:var(--card2);}
+.slip-thumb{width:48px;height:48px;object-fit:cover;border-radius:6px;
+  border:1px solid var(--border);flex-shrink:0;}
+.slip-info{flex:1;}
+.slip-title{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--gold);}
+.slip-date{font-size:.7rem;color:var(--muted);}
+.slip-total-badge{background:rgba(46,160,67,.15);border:1px solid var(--green);
+  border-radius:8px;padding:4px 10px;text-align:right;}
+.slip-total-badge .stb-label{font-size:.6rem;color:var(--gl);letter-spacing:1px;}
+.slip-total-badge .stb-amt{font-family:'Playfair Display',serif;font-size:1rem;color:#fff;font-weight:700;}
+.slip-del-btn{background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.3);
+  color:var(--red);border-radius:8px;padding:6px 10px;font-size:.8rem;
+  cursor:pointer;touch-action:manipulation;white-space:nowrap;}
+
+/* CURRENCY TABLE */
+.curr-table{width:100%;border-collapse:collapse;}
+.curr-table th{background:rgba(240,208,128,.08);color:var(--gold);
+  font-size:.7rem;letter-spacing:1px;text-transform:uppercase;
+  padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.curr-table td{padding:8px 10px;font-size:.85rem;border-bottom:1px solid rgba(48,54,61,.4);vertical-align:middle;}
+.curr-table tr:last-child td{border-bottom:none;}
+.curr-code{font-weight:700;color:var(--gold);font-size:.9rem;}
+.curr-amt{color:var(--text);}
+.curr-rate{color:var(--muted);}
+.curr-sub{color:var(--gl);font-weight:700;}
+.action-btns{display:flex;gap:6px;}
+.edit-btn{background:rgba(240,208,128,.1);border:1px solid rgba(240,208,128,.3);
+  color:var(--gold);border-radius:6px;padding:4px 8px;font-size:.72rem;
+  cursor:pointer;touch-action:manipulation;}
+.del-btn{background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);
+  color:var(--red);border-radius:6px;padding:4px 8px;font-size:.72rem;
+  cursor:pointer;touch-action:manipulation;}
+
+/* ADD ROW */
+.add-row-btn{width:100%;padding:10px;background:rgba(255,255,255,.04);
+  border:1px dashed rgba(240,208,128,.25);border-radius:0 0 14px 14px;
+  color:var(--muted);font-size:.82rem;cursor:pointer;touch-action:manipulation;
+  font-family:'Courier Prime',monospace;}
+.add-row-btn:hover{color:var(--gold);}
+
+/* EDIT MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:2000;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:24px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:16px;}
+.modal h3{font-family:'Playfair Display',serif;color:var(--gold);font-size:1.1rem;}
+.modal .field input{background:rgba(255,255,255,.08);border:1px solid var(--border);
+  color:#fff;border-radius:8px;padding:10px 12px;width:100%;font-family:'Courier Prime',monospace;font-size:1rem;outline:none;}
+.modal .field input:focus{border-color:var(--gold);}
+.modal-btns{display:flex;gap:10px;}
+.modal-save{flex:1;padding:12px;border-radius:10px;border:none;
+  background:linear-gradient(135deg,#1a6b2a,#2ea043);color:#fff;
+  font-family:'Courier Prime',monospace;font-size:.95rem;font-weight:700;cursor:pointer;}
+.modal-cancel{flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);
+  background:none;color:var(--muted);font-family:'Courier Prime',monospace;
+  font-size:.95rem;cursor:pointer;}
+
+.empty{padding:30px;text-align:center;color:var(--muted);font-size:.85rem;line-height:1.8;}
+.clr-all-btn{width:100%;max-width:480px;padding:11px;border-radius:10px;
+  background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);
+  color:var(--red);font-family:'Courier Prime',monospace;font-size:.9rem;cursor:pointer;touch-action:manipulation;}
+</style>
+</head>
+<body>
+
+<!-- ══ PAGE 1: CHEQUE ══ -->
+<div class="page active" id="page-cheque">
+  <div class="page-title">✦ Cheque Writer</div>
+  <div class="page-sub">Sampath Bank Supreme</div>
+  <div class="panel">
+    <div class="field">
+      <label>Pay To</label>
+      <input id="payee" type="text" placeholder="e.g. CASH" value="CASH">
+    </div>
+    <div class="crow">
+      <div class="field">
+        <label>Amount (Rs.)</label>
+        <input id="amount" type="text" placeholder="10,720,000" inputmode="numeric" oninput="fmtInput(this)">
+      </div>
+      <div class="field">
+        <label>Date</label>
+        <input id="chq-date" type="date">
+      </div>
+    </div>
+    <button class="btn-generate" onclick="generate()">✦ Generate Cheque</button>
+  </div>
+  <div class="cheque-wrap">
+    <div class="cheque empty" id="cheque">
+      <div class="cheque-header">
+        <div></div>
+        <div class="supreme-badge">Supreme<small>Customer Since 1999</small></div>
+      </div>
+      <div class="date-section">
+        <div class="date-box"><span>DATE</span><span class="date-val" id="disp-date">__ / __ / 20__</span></div>
+      </div>
+      <div class="pay-row">
+        <span class="pay-label">Pay</span>
+        <span class="pay-name" id="disp-payee">——————————————</span>
+        <span class="or-bearer">Or Bearer</span>
+      </div>
+      <div class="words-row">
+        <div class="words-label">Rupees / රුපියල් / ரூபாய்</div>
+        <div class="words-val" id="disp-words">——————————————————————————</div>
+      </div>
+      <div class="cheque-bottom">
+        <div class="amount-box">
+          <div class="currency">Rs. / රු. / ரூ.</div>
+          <div class="amount-fig" id="disp-amount">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE 2: SCANNER ══ -->
+<div class="page" id="page-scanner">
+  <div class="page-title">📄 Slip Scanner</div>
+  <div class="page-sub">Foreign Currency Deposit · Multi-slip Total</div>
+
+  <div class="grand-card">
+    <div class="grand-label">Grand Total (LKR)</div>
+    <div class="grand-amt">Rs. <span id="grand-total">0</span></div>
+    <div class="grand-sub" id="grand-sub">0 slips · 0 currency rows</div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="upload-card">
+    <h3>📎 Add New Slip</h3>
+    <div class="three-btns">
+      <!-- Camera -->
+      <div class="file-btn-wrap" style="background:linear-gradient(135deg,#c8860a,#e05a00);">
+        <div class="file-btn-bg">📷<br><span>Camera</span></div>
+        <input type="file" id="pick-camera" accept="image/*" capture="camera">
+      </div>
+      <!-- Gallery -->
+      <div class="file-btn-wrap" style="background:linear-gradient(135deg,#1a4a7a,#1a6bb5);">
+        <div class="file-btn-bg">🖼️<br><span>Gallery</span></div>
+        <input type="file" id="pick-gallery" accept="image/*">
+      </div>
+      <!-- File -->
+      <div class="file-btn-wrap" style="background:linear-gradient(135deg,#2a3a2a,#2ea043);">
+        <div class="file-btn-bg">📁<br><span>Files</span></div>
+        <input type="file" id="pick-file" accept="*/*">
+      </div>
+    </div>
+    <div id="prev-wrap"><img id="prev-img" src="" alt=""></div>
+    <button class="scan-btn" id="scan-btn" disabled>🔍 Scan &amp; Extract Currencies</button>
+    <div class="sstatus" id="sstatus">Take or pick a photo of your deposit slip</div>
+  </div>
+
+  <!-- SLIPS -->
+  <div class="slips-wrap" id="slips-wrap">
+    <div class="empty" id="empty-msg">No slips added yet. Take a photo above.</div>
+  </div>
+
+  <button class="clr-all-btn" id="clr-all-btn">🗑 Clear All Slips</button>
+</div>
+
+<!-- ══ BOTTOM NAV ══ -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-cheque" onclick="showPage('cheque')">
+    <span class="icon">✍️</span><span>Cheque</span>
+  </button>
+  <button class="nav-btn" id="nav-scanner" onclick="showPage('scanner')">
+    <span class="icon">📄</span><span>Scanner</span>
+  </button>
+</nav>
+
+<!-- ══ EDIT MODAL ══ -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <h3>✏️ Edit Currency Row</h3>
+    <div class="field"><label>Currency Code</label><input id="edit-code" type="text" placeholder="e.g. USD" maxlength="4"></div>
+    <div class="field"><label>Foreign Amount</label><input id="edit-amt" type="number" placeholder="e.g. 100.00" step="0.01"></div>
+    <div class="field"><label>Rate (LKR per 1 unit)</label><input id="edit-rate" type="number" placeholder="e.g. 320.50" step="0.01"></div>
+    <div class="field"><label>Subtotal (LKR) — auto calc</label><input id="edit-sub" type="number" placeholder="Auto" step="0.01" readonly style="opacity:.6"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-save" onclick="saveEdit()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══ NAV ══ */
+function showPage(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+n).classList.add('active');
+  document.getElementById('nav-'+n).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ══ CHEQUE ══ */
+var ones=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+var tens=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+function fmtInput(el){var r=el.value.replace(/,/g,'');if(!/^\d*$/.test(r)){el.value=el.value.slice(0,-1);return;}if(!r){el.value='';return;}el.value=parseInt(r).toLocaleString('en-US');}
+function b3(n){if(!n)return'';var p=[];if(~~(n/100)){p.push(ones[~~(n/100)]+' Hundred');n%=100;}if(n){if(n<20)p.push(ones[n]);else{var t=tens[~~(n/10)],o=ones[n%10];p.push(o?t+' '+o:t);}}return p.join(' ');}
+function inW(n){n=~~n;if(!n)return'Zero';var g=[{v:1e15,n:'Quadrillion'},{v:1e12,n:'Trillion'},{v:1e9,n:'Billion'},{v:1e6,n:'Million'},{v:1e3,n:'Thousand'},{v:1,n:''}],p=[];for(var i=0;i<g.length;i++){var q=~~(n/g[i].v);if(q){p.push(g[i].n?b3(q)+' '+g[i].n:b3(q));n%=g[i].v;}}return p.join(' ');}
+function generate(){
+  var payee=document.getElementById('payee').value.trim()||'CASH';
+  var amount=parseFloat(document.getElementById('amount').value.replace(/,/g,''))||0;
+  var date=document.getElementById('chq-date').value;
+  var ch=document.getElementById('cheque');ch.classList.remove('empty');
+  document.getElementById('disp-payee').textContent=payee;
+  document.getElementById('disp-words').textContent=inW(amount)+' Only';
+  document.getElementById('disp-amount').textContent=amount.toLocaleString('en-US',{maximumFractionDigits:0});
+  if(date){var p=date.split('-');document.getElementById('disp-date').textContent=p[2]+'/'+p[1]+'/'+p[0];}
+}
+(function(){var d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');document.getElementById('chq-date').value=y+'-'+m+'-'+day;})();
+
+/* ══ SCANNER ══ */
+var slips=[];
+var editTarget={slipId:null,rowId:null};
+
+/* File pick — 3 inputs */
+function handlePick(e){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    var url=ev.target.result;
+    window._scanB64=url.split(',')[1];
+    window._scanThumb=url;
+    document.getElementById('prev-img').src=url;
+    document.getElementById('prev-wrap').style.display='block';
+    var sb=document.getElementById('scan-btn');sb.style.display='block';sb.disabled=false;
+    setSt('Image ready — tap Scan to extract currencies','');
+  };
+  r.readAsDataURL(f);e.target.value='';
+}
+document.getElementById('pick-camera').addEventListener('change',handlePick);
+document.getElementById('pick-gallery').addEventListener('change',handlePick);
+document.getElementById('pick-file').addEventListener('change',handlePick);
+
+/* Scan */
+document.getElementById('scan-btn').addEventListener('click',async function(){
+  if(!window._scanB64)return;
+  var sb=this;sb.disabled=true;
+  setSt('🤖 AI reading currencies from slip...','loading');
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:'image/jpeg',data:window._scanB64}},
+          {type:'text',text:`This image contains handwritten or printed calculations. Each line has a format like: AMOUNT × RATE = RESULT, or just AMOUNT × RATE.
+Extract ALL calculation rows you can see.
+For each row: amount is the first number, rate is the second number, subtotal = amount × rate.
+Also try to identify currency codes if visible (USD, INR, EUR etc), otherwise use "CCY".
+Reply ONLY as JSON (no extra text):
+{
+  "slip_date": null,
+  "account": null,
+  "rows": [
+    {"code":"USD","amount":455,"rate":355,"subtotal":161525},
+    {"code":"EUR","amount":395,"rate":1000,"subtotal":395000}
+  ],
+  "grand_total": 556525
+}
+Amount and rate must be numbers. Calculate subtotal = amount × rate exactly.`}
+        ]}]
+      })
+    });
+    var d=await res.json();
+    var txt=(d.content||[]).map(c=>c.text||'').join('');
+    var clean=txt.replace(/```json|```/g,'').trim();
+    var p=JSON.parse(clean);
+    if(p.rows&&p.rows.length>0){
+      var slip={
+        id:Date.now(),
+        thumb:window._scanThumb,
+        date:p.slip_date||new Date().toISOString().split('T')[0],
+        account:p.account||'',
+        rows:p.rows.map(function(r,i){return{id:Date.now()+i,code:(r.code||'').toUpperCase(),amount:r.amount||0,rate:r.rate||0,subtotal:r.subtotal||(r.amount*r.rate)||0};})
+      };
+      slips.push(slip);
+      renderAll();
+      setSt('✅ '+slip.rows.length+' currency rows extracted!','success');
+      document.getElementById('prev-wrap').style.display='none';
+      sb.style.display='none';
+      window._scanB64=null;window._scanThumb=null;
+    } else {
+      setSt('⚠️ No currency data found. Try a clearer photo.','error');
+      sb.disabled=false;
+    }
+  }catch(e){
+    setSt('❌ Error: '+e.message,'error');
+    sb.disabled=false;
+  }
+});
+
+/* Clear all */
+document.getElementById('clr-all-btn').addEventListener('click',function(){
+  if(!slips.length)return;
+  if(confirm('Clear all slips?')){slips=[];renderAll();}
+});
+
+/* RENDER */
+function renderAll(){
+  var wrap=document.getElementById('slips-wrap');
+  if(!slips.length){
+    wrap.innerHTML='<div class="empty" id="empty-msg">No slips added yet. Take a photo above.</div>';
+    updateGrand();return;
+  }
+  wrap.innerHTML=slips.map(function(slip,si){
+    var slipTotal=slip.rows.reduce(function(s,r){return s+(r.subtotal||0);},0);
+    var rows=slip.rows.map(function(row,ri){
+      var sub=Math.round(row.amount*row.rate);
+      return '<tr>'+
+        '<td><span class="curr-code">'+( row.code||'CCY')+'</span></td>'+
+        '<td><span class="curr-amt">'+Number(row.amount).toLocaleString('en-US',{maximumFractionDigits:4})+'</span></td>'+
+        '<td style="color:#f0d080;font-size:1.1rem;text-align:center;">×</td>'+
+        '<td><span class="curr-rate">'+Number(row.rate).toLocaleString('en-US',{maximumFractionDigits:4})+'</span></td>'+
+        '<td style="color:#f0d080;font-size:1.1rem;text-align:center;">=</td>'+
+        '<td><span class="curr-sub">'+sub.toLocaleString('en-US')+'</span></td>'+
+        '<td><div class="action-btns">'+
+          '<button class="edit-btn" onclick="openEdit(\''+slip.id+'\',\''+row.id+'\')">✏️</button>'+
+          '<button class="del-btn" onclick="delRow(\''+slip.id+'\',\''+row.id+'\')">🗑</button>'+
+        '</div></td>'+
+      '</tr>';
+    }).join('');
+    return '<div class="slip-card">'+
+      '<div class="slip-header">'+
+        '<img class="slip-thumb" src="'+slip.thumb+'">'+
+        '<div class="slip-info">'+
+          '<div class="slip-title">Slip #'+(si+1)+'</div>'+
+          '<div class="slip-date">'+slip.date+(slip.account?' · '+slip.account:'')+'</div>'+
+        '</div>'+
+        '<div class="slip-total-badge">'+
+          '<div class="stb-label">TOTAL LKR</div>'+
+          '<div class="stb-amt">'+Math.round(slipTotal).toLocaleString('en-US')+'</div>'+
+        '</div>'+
+        '<button class="slip-del-btn" onclick="delSlip(\''+slip.id+'\')">🗑</button>'+
+      '</div>'+
+      '<table class="curr-table">'+
+        '<thead><tr><th>CCY</th><th>Amount</th><th></th><th>Rate</th><th></th><th>LKR Total</th><th></th></tr></thead>'+
+        '<tbody>'+rows+'</tbody>'+
+      '</table>'+
+      '<div style="background:rgba(240,208,128,.08);border-top:2px solid rgba(240,208,128,.3);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">'+
+        '<span style="color:#8b949e;font-size:.8rem;letter-spacing:1px;">GRAND TOTAL LKR</span>'+
+        '<span style="font-family:\'Playfair Display\',serif;font-size:1.3rem;color:#56d364;font-weight:700;">'+Math.round(slipTotal).toLocaleString('en-US')+'</span>'+
+      '</div>'+
+      '<button class="add-row-btn" onclick="addManualRow(\''+slip.id+'\')">＋ Add Row</button>'+
+    '</div>';
+  }).join('');
+  updateGrand();
+}
+
+function updateGrand(){
+  var total=slips.reduce(function(s,slip){return s+slip.rows.reduce(function(s2,r){return s2+(r.subtotal||0);},0);},0);
+  var rowCount=slips.reduce(function(s,slip){return s+slip.rows.length;},0);
+  document.getElementById('grand-total').textContent=Math.round(total).toLocaleString('en-US');
+  document.getElementById('grand-sub').textContent=slips.length+' slip'+(slips.length!==1?'s':'')+' · '+rowCount+' currency rows';
+}
+
+/* DEL SLIP */
+function delSlip(sid){
+  if(!confirm('Delete this slip?'))return;
+  slips=slips.filter(function(s){return s.id!=sid;});
+  renderAll();
+}
+
+/* DEL ROW */
+function delRow(sid,rid){
+  var slip=slips.find(function(s){return s.id==sid;});
+  if(!slip)return;
+  slip.rows=slip.rows.filter(function(r){return r.id!=rid;});
+  renderAll();
+}
+
+/* ADD MANUAL ROW */
+function addManualRow(sid){
+  var slip=slips.find(function(s){return s.id==sid;});
+  if(!slip)return;
+  slip.rows.push({id:Date.now(),code:'',amount:0,rate:0,subtotal:0});
+  renderAll();
+  // open edit for the new row
+  var newRow=slip.rows[slip.rows.length-1];
+  openEdit(sid,newRow.id);
+}
+
+/* EDIT MODAL */
+function openEdit(sid,rid){
+  var slip=slips.find(function(s){return s.id==sid;});
+  if(!slip)return;
+  var row=slip.rows.find(function(r){return r.id==rid;});
+  if(!row)return;
+  editTarget={slipId:sid,rowId:rid};
+  document.getElementById('edit-code').value=row.code||'';
+  document.getElementById('edit-amt').value=row.amount||'';
+  document.getElementById('edit-rate').value=row.rate||'';
+  document.getElementById('edit-sub').value=row.subtotal?Math.round(row.subtotal):'';
+  document.getElementById('edit-modal').classList.add('open');
+}
+// auto calc subtotal in modal
+document.getElementById('edit-amt').addEventListener('input',calcModalSub);
+document.getElementById('edit-rate').addEventListener('input',calcModalSub);
+function calcModalSub(){
+  var a=parseFloat(document.getElementById('edit-amt').value)||0;
+  var r=parseFloat(document.getElementById('edit-rate').value)||0;
+  document.getElementById('edit-sub').value=a&&r?Math.round(a*r):'';
+}
+function closeModal(){document.getElementById('edit-modal').classList.remove('open');}
+function saveEdit(){
+  var slip=slips.find(function(s){return s.id==editTarget.slipId;});
+  if(!slip)return;
+  var row=slip.rows.find(function(r){return r.id==editTarget.rowId;});
+  if(!row)return;
+  row.code=document.getElementById('edit-code').value.toUpperCase().trim();
+  row.amount=parseFloat(document.getElementById('edit-amt').value)||0;
+  row.rate=parseFloat(document.getElementById('edit-rate').value)||0;
+  row.subtotal=row.amount*row.rate;
+  closeModal();
+  renderAll();
+  setSt('✅ Row updated!','success');
+}
+
+function setSt(m,c){var el=document.getElementById('sstatus');el.textContent=m;el.className='sstatus '+(c||'');}
+</script>
+</body>
+</html>
